@@ -35,16 +35,22 @@ def pull_requests_info(repo: str, settings: settings):
 
 @app.get("/ls/{repo:path}")
 def show_tree_repo(repo: str, settings: settings):
+    """
+    Show an entire tree (dir) of the repo from root.
+    """
     repo_manager = GitRepositoryManager()
     repo_obj = repo_manager.get_repo_gitpython(repo=repo)
     master_tree = repo_obj.tree(repo_obj.heads[0])
     resp = []
     for obj in master_tree.list_traverse():
-        resp.append(f"{obj.abspath} ||| type: {obj.type}")
+        resp.append(f"{obj.path} ||| type: {obj.type}")
     return resp
 
 @app.get("/readme/{repo:path}")
 def show_readme(repo: str, settings: settings):
+    """
+    Show contents of README.md file in repo.
+    """
     repo_manager = GitRepositoryManager()
     repo_obj = repo_manager.get_repo_gitpython(repo=repo)
     master_tree = repo_obj.tree(repo_obj.heads[0])

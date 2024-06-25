@@ -32,23 +32,23 @@ def list_closed_pull_requests(repo_name: str, token: str):
 """ TODO: Use GitPython instead of PyDriller.
 
     The problems right now are:
-    - PyDriller does not support usage of trees. (File listing of repository.)
+    - PyDriller does not support usage of trees. (File listing of repository.)                      (Fixed)
     - PyDriller Git class requires local repository instead of remote repository,
-    so their functionality on automatic repository cloning isn't supported.
+    so their functionality on automatic repository cloning isn't supported.                         (Fixed)
     - PyDriller does not provide a way to directly access Repo class from GitPython,
-    so it is not possible to call any external methods that are not from PyDriller.
+    so it is not possible to call any external methods that are not from PyDriller.                 (Fixed)
 
     To fix them:
-    - Use GitPython directly instead.
+    - Use GitPython directly instead.                                                               (Completed)
     - The GitPython library provides all types of objects including Blobs.
     - Blobs are a unit of file in a repository. It also provides `data_stream` property,
-    use it to read file contents.
+    use it to read file contents.                                                                   (Tested, requires implementation for usage.)
     - GitPython provides a method to easily clone remote repository, however it doesn't provide
-    automatic deletion after usage. (requires manual implementation)
+    automatic deletion after usage.                                                                 (Completed)
 
     Drawbacks:
-    - GitPython does not have Delta Maintainability Model, but we can still hook the repository from
-    GitPython up to PyDriller, so it's fixable.
+    - GitPython does not have Delta Maintainability Model, but we can still hook the repository 
+    from GitPython up to PyDriller, so it's fixable.                                                (In Progress)
     - There are less abstraction in GitPython, which requires intensive research.
 """
 
