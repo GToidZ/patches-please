@@ -1,0 +1,2 @@
+# Patches, Please!
+An <insert theme here> puzzle game with mechanics that puts you in role of software QA or reviewer! The premise of the video game also includes being a software repository mining tool.

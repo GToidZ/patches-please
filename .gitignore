@@ -1,0 +1,11 @@
+# Python modules & virtual envs
+venv/
+env/
+**/__pycache__/
+
+# Environment variables
+.env*
+!.env.example
+
+# Project-related
+repos/

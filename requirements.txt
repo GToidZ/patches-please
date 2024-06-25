@@ -1,0 +1,6 @@
+# Git client library
+pydriller>=2.6
+
+# HTTP API
+fastapi>=0.111.0
+pydantic-settings
