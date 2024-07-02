@@ -1,19 +1,24 @@
-from pydriller import Repository, Git, Commit
-from typing import List
 from re import match
 
-import itertools
 import httpx
 
 _GH_API_URL = "https://api.github.com"
 
-
-def get_repository(repo_name: str) -> Repository:
-    return Repository(f"https://github.com/{repo_name}.git",
-                      only_modifications_with_file_types=[".py"])
+"""
+TODO:
+- Add more functions that are related to using GitHub REST API.
+! Change the name of this Python file.
+"""
 
 def list_closed_pull_requests(repo_name: str, token: str):
-    # TODO: implement caching.
+    """
+    TODO: Implement caching for HTTP(S) requests to GitHub API.
+    The ideas:
+    - httpx recommends using a drop-in replacement called 'Hishel'
+    - Hishel supports SQLite, however let's see if other relational database is supported.
+    - Amazingly, devs of Hishel documented the example of caching GitHub responses here,
+        https://hishel.com/examples/github/
+    """
     # Sends a GET request to GitHub API, /repos/{owner}/{repo}/pulls
     if not isinstance(repo_name, str):
         raise TypeError(f"Name of the repository {repo_name} is not a string.")
@@ -28,31 +33,3 @@ def list_closed_pull_requests(repo_name: str, token: str):
     if r.status_code != httpx.codes.OK:
         raise RuntimeError(f"Cannot obtain pull requests from GitHub repository, {repo_name}.")
     return r.json()
-
-""" TODO: Use GitPython instead of PyDriller.
-
-    The problems right now are:
-    - PyDriller does not support usage of trees. (File listing of repository.)                      (Fixed)
-    - PyDriller Git class requires local repository instead of remote repository,
-    so their functionality on automatic repository cloning isn't supported.                         (Fixed)
-    - PyDriller does not provide a way to directly access Repo class from GitPython,
-    so it is not possible to call any external methods that are not from PyDriller.                 (Fixed)
-
-    To fix them:
-    - Use GitPython directly instead.                                                               (Completed)
-    - The GitPython library provides all types of objects including Blobs.
-    - Blobs are a unit of file in a repository. It also provides `data_stream` property,
-    use it to read file contents.                                                                   (Tested, requires implementation for usage.)
-    - GitPython provides a method to easily clone remote repository, however it doesn't provide
-    automatic deletion after usage.                                                                 (Completed)
-
-    Drawbacks:
-    - GitPython does not have Delta Maintainability Model, but we can still hook the repository 
-    from GitPython up to PyDriller, so it's fixable.                                                (In Progress)
-    - There are less abstraction in GitPython, which requires intensive research.
-"""
-
-# -- Playground --
-
-def get_n_commits(n: int) -> List[Commit]:
-    return itertools.islice(get_repository("").traverse_commits(), n)
