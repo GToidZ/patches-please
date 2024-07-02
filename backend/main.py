@@ -1,6 +1,8 @@
 import contextlib
+import itertools
 from fastapi import FastAPI
 from git import Blob
+from pydriller import Commit
 
 from .config import settings
 from .git import list_closed_pull_requests, GitRepositoryManager
@@ -13,21 +15,8 @@ async def app_lifecycle(app: FastAPI):
 
 app = FastAPI(lifespan=app_lifecycle)
 
-""" @app.get("/commits")
-def commits_info(n: int = 10):
-    res = {}
-    commits = get_n_commits(n)
-    for c in commits:
-        res[c.hash] = {
-            "msg": c.msg,
-            "insertions": c.insertions,
-            "deletions": c.deletions,
-            "modified": c.lines,
-            "files": [f.filename for f in c.modified_files],
-            "datetime": c.committer_date,
-            "timezone": c.committer_timezone
-        }
-    return res """
+
+# -- Tests --
 
 @app.get("/pr/{repo:path}")
 def pull_requests_info(repo: str, settings: settings):
@@ -39,7 +28,7 @@ def show_tree_repo(repo: str, settings: settings):
     Show an entire tree (dir) of the repo from root.
     """
     repo_manager = GitRepositoryManager()
-    repo_obj = repo_manager.get_repo_gitpython(repo=repo)
+    repo_obj = repo_manager.get_repository(repo=repo).gitpython()
     master_tree = repo_obj.tree(repo_obj.heads[0])
     resp = []
     for obj in master_tree.list_traverse():
@@ -52,7 +41,7 @@ def show_readme(repo: str, settings: settings):
     Show contents of README.md file in repo.
     """
     repo_manager = GitRepositoryManager()
-    repo_obj = repo_manager.get_repo_gitpython(repo=repo)
+    repo_obj = repo_manager.get_repository(repo=repo).gitpython()
     master_tree = repo_obj.tree(repo_obj.heads[0])
     
     try:
@@ -60,3 +49,18 @@ def show_readme(repo: str, settings: settings):
         return readme.data_stream.read()
     except:
         return "No README.md"
+
+@app.get("/commits/{repo:path}")
+def list_commits_pydriller(repo: str, settings: settings):
+    """
+    List commits using PyDriller.
+    """
+    repo_manager = GitRepositoryManager()
+    repo_obj = repo_manager.get_repository(repo=repo).pydriller()
+    resp = []
+    for c in repo_obj.traverse_commits():
+        resp.append({
+            "title": c.msg,
+            "when": c.committer_date
+        })
+    return resp

@@ -1,6 +1,6 @@
 import shutil, os, stat, httpx
 
-from typing import Dict, Union
+from typing import Dict
 from pathlib import Path
 from logging import Logger, getLogger
 from re import match
@@ -9,11 +9,49 @@ from git import Repo
 from git import Repo as GitPythonRepository
 from pydriller import Repository as PyDrillerRepository
 
+
+class RepositoryAccessor:
+
+    path: os.PathLike = ""
+    __gitpython_instance: GitPythonRepository = None
+    __pydriller_instance: PyDrillerRepository = None
+
+    def __init__(self, path: os.PathLike):
+        self.path = path
+
+    def gitpython(self):
+        if not self.__gitpython_instance:
+            try:
+                self.__gitpython_instance = GitPythonRepository(self.path)
+            except:
+                raise RuntimeError(f"Error while creating a GitPython instance at {self.path}")
+        return self.__gitpython_instance
+
+    def pydriller(self):
+        if not self.__pydriller_instance:
+            try:
+                self.__pydriller_instance = PyDrillerRepository(str(self.path))
+            except:
+                raise RuntimeError(f"Error while creating a PyDriller instance at {self.path}")
+        return self.__pydriller_instance
+
+    def close(self):
+        if self.__gitpython_instance:
+            self.__gitpython_instance.git.clear_cache()
+            self.__gitpython_instance.close()
+
+        # we can ignore PyDriller instance since it manages to close the repository
+        # on its own.
+
+        # if self.__pydriller_instance:
+        #    self.__pydriller_instance.git.clear()
+
+
 class GitRepositoryManager:
 
     root_dir = Path("repos")
     repos: Dict[str, Path] = dict()
-    active_repos: Dict[str, Union[GitPythonRepository, PyDrillerRepository]] = dict()
+    active_repos: Dict[str, RepositoryAccessor] = dict()
     logger: Logger = getLogger("RepoManager")
 
     def __new__(cls) -> "GitRepositoryManager":
@@ -30,9 +68,7 @@ class GitRepositoryManager:
 
     def cleanup(self):
         if self.active_repos:
-            # TODO: Make it compatible with PyDriller
             for repo in self.active_repos.values():
-                repo.git.clear_cache()
                 repo.close()
         if self.root_dir.exists():
             for root, dirs, files in os.walk(self.root_dir):
@@ -56,7 +92,7 @@ class GitRepositoryManager:
         return wrapper
 
     @__repo_str_constraint
-    def _get_repository(self, repo: str) -> Path:
+    def _get_repository_path(self, repo: str) -> Path:
         if not repo in self.repos:
             self.__clone_repository(repo)
         return self.repos[repo]
@@ -74,16 +110,10 @@ class GitRepositoryManager:
         self.repos[repo] = ref_path.absolute()
 
     @__repo_str_constraint
-    def get_repo_gitpython(self, repo: str) -> GitPythonRepository:
+    def get_repository(self, repo: str) -> RepositoryAccessor:
         if repo not in self.active_repos:
-            ref = self._get_repository(repo)
-            ret_repo = GitPythonRepository(ref)
+            ref = self._get_repository_path(repo)
+            ret_repo = RepositoryAccessor(ref)
             self.active_repos[repo] = ret_repo
             return ret_repo
         return self.active_repos[repo]
-
-    @__repo_str_constraint
-    def get_repo_pydriller(self, repo: str) -> PyDrillerRepository:
-        # TODO: Hook this to GitPython Repository so we can use the Delta Maintainability Model
-        ref = self._get_repository(repo)
-        return PyDrillerRepository(ref)
