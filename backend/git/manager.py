@@ -12,11 +12,11 @@ from pydriller import Repository as PyDrillerRepository
 
 class RepositoryAccessor:
 
-    path: os.PathLike = ""
+    path: Path = None
     __gitpython_instance: GitPythonRepository = None
     __pydriller_instance: PyDrillerRepository = None
 
-    def __init__(self, path: os.PathLike):
+    def __init__(self, path: Path):
         self.path = path
 
     def gitpython(self):
@@ -24,7 +24,8 @@ class RepositoryAccessor:
             try:
                 self.__gitpython_instance = GitPythonRepository(self.path)
             except:
-                raise RuntimeError(f"Error while creating a GitPython instance at {self.path}")
+                raise RuntimeError("Error while creating a GitPython instance of "\
+                                   f"{self.path.parent.name}/{self.path.name}")
         return self.__gitpython_instance
 
     def pydriller(self):
@@ -32,7 +33,8 @@ class RepositoryAccessor:
             try:
                 self.__pydriller_instance = PyDrillerRepository(str(self.path))
             except:
-                raise RuntimeError(f"Error while creating a PyDriller instance at {self.path}")
+                raise RuntimeError("Error while creating a PyDriller instance of "\
+                                   f"{self.path.parent.name}/{self.path.name}")
         return self.__pydriller_instance
 
     def close(self):
