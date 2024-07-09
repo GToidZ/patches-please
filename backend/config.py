@@ -7,6 +7,8 @@ class Settings(BaseSettings):
 
     gh_api_token: str
 
+    sql_db_url: str
+
     model_config = SettingsConfigDict(
         env_file=(".env", ".env.production"),
         env_file_encoding="utf-8",

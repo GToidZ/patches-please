@@ -9,3 +9,6 @@ env/
 
 # Project-related
 repos/
+requirements.local.txt
+
+*.sqlite

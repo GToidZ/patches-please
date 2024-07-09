@@ -1,8 +1,17 @@
 from re import match
 
-import httpx
+import hishel, httpx
+#from hishel_sqla._sync import SQLAlchemyStorage
+
+from ...config import get_settings
 
 _GH_API_URL = "https://api.github.com"
+client = hishel.CacheClient(
+    storage=hishel.SQLiteStorage()
+    #storage=SQLAlchemyStorage(
+        #get_settings().sql_db_url
+    #)
+)
 
 """
 TODO:
@@ -29,7 +38,7 @@ def list_closed_pull_requests(repo_name: str, token: str):
         "Authorization": f"Bearer {token}",
         "X-GitHub-Api-Version": "2022-11-28"
     }
-    r = httpx.get(f"{_GH_API_URL}/repos/{repo_name}/pulls?state=closed", headers=headers)
+    r = client.get(f"{_GH_API_URL}/repos/{repo_name}/pulls?state=closed", headers=headers)
     if r.status_code != httpx.codes.OK:
         raise RuntimeError(f"Cannot obtain pull requests from GitHub repository, {repo_name}.")
     return r.json()

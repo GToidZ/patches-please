@@ -2,10 +2,10 @@ import contextlib
 import itertools
 from fastapi import FastAPI
 from git import Blob
-from pydriller import Commit
 
 from .config import settings
-from .git import list_closed_pull_requests, GitRepositoryManager
+from .git import GitRepositoryManager
+from .git.github import list_closed_pull_requests
 
 @contextlib.asynccontextmanager
 async def app_lifecycle(app: FastAPI):
