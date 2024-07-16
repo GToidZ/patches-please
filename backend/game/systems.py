@@ -7,7 +7,7 @@ import random
 from functools import lru_cache
 from uuid import uuid4
 from typing import List
-from .objects import Level, Prompt, Answer
+from .objects import Level, Prompt, Answer, GameSession
 from ..git import GitRepositoryManager, list_merged_pull_requests
 from ..config import get_settings
 
@@ -114,12 +114,32 @@ class GameSystem:
 
         return prompt
 
-"""
-When displaying a change between parent and to-merge:
-For example, merge commit is `1234abcd`
 
-* The left side (original/parent) must use parent ref, 1234abcd^1
-* The right side (new) must use another parent ref, 1234abcd^2
+    """
+    When displaying a change between parent and to-merge:
+    For example, merge commit is `1234abcd`
 
-ref: https://haacked.com/archive/2014/02/21/reviewing-merge-commits/
-"""
+    * The left side (original/parent) must use parent ref, 1234abcd^1
+    * The right side (new) must use another parent ref, 1234abcd^2
+
+    ref: https://haacked.com/archive/2014/02/21/reviewing-merge-commits/
+    """
+
+
+    def send_answer(self, game_session: GameSession, answer: bool):
+
+        # TODO: Implement a way for game session to access level and prompt.
+        level = game_session.current_level
+
+        if level:
+            # TODO: Implement a way to access current prompt.
+            prompt = None
+            correct_answer = None
+
+            if answer == correct_answer:
+                # TODO: Add further scoring logic.
+                game_session.score += 10
+            else:
+                game_session.lives -= 1
+        
+        return game_session
