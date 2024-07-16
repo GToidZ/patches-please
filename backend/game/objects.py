@@ -45,8 +45,8 @@ class Level(BaseModel):
         str, AfterValidator(_validate_repo_name)
     ]
 
-    rand_seed: int
-    rand_step: int = 0
+    """ rand_seed: int
+    rand_step: int = 0 """
 
 class Prompt(BaseModel):
     id: UUID4

@@ -17,7 +17,9 @@ repo_manager = GitRepositoryManager()
 """
 TODO:
 - Save game objects from the system to a database (could be relational database)
-- Implement logic for generating levels and prompts.
+- Implement logic for generating levels and prompts. (In progress)
+    - Find a workaround, when a merge is rejected and is from forks, the Git will not
+      be able to find the commit.
 """
 
 class GameSystem:
@@ -25,15 +27,12 @@ class GameSystem:
     def generate_new_level(self, repo: str):
 
         # Generate 14-unit long as seed
-        __min = 10**(14-1)
-        __max = 9*__min + (__min-1)
+        """ __min = 10**(14-1)
+        __max = 9*__min + (__min-1) """
 
         level = Level(
             id=uuid4(),
             repo_id=repo,
-            rand_seed=random.randint(
-                __min, __max
-            )
         )
         
         repo_manager.get_repository(repo)   # Preload repository
@@ -111,6 +110,7 @@ class GameSystem:
             prompt=prompt.id,
             accept=selected_pr["merged"]
         )
+
 
         return prompt
 
