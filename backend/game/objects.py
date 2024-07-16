@@ -52,11 +52,8 @@ class Prompt(BaseModel):
     id: UUID4
     level: UUID4
 
-    pull_request_id: int
-
+    reference: str      # Ref string for Git object to merge commit
     main_file: str      # Path from root of repo to file
-    lines_change_begin: int
-    lines_change_end: int
 
     start_time: datetime = datetime.now()
     submission_time: Union[datetime, None] = None

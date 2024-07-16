@@ -9,6 +9,7 @@ from .git import (
     list_closed_pull_requests,
     list_merged_pull_requests
 )
+from .game import GameSystem
 
 @contextlib.asynccontextmanager
 async def app_lifecycle(app: FastAPI):
@@ -71,3 +72,13 @@ def list_commits_pydriller(repo: str, settings: settings):
             "when": c.committer_date
         })
     return resp
+
+@app.get("/test/prompt/{repo:path}")
+def test_generate_prompt(repo: str, settings: settings):
+    """
+    Test generate a prompt in game.
+    """
+    system = GameSystem()
+    level = system.generate_new_level(repo)
+    prompt = system.generate_new_prompt(level)
+    return prompt.model_dump_json()

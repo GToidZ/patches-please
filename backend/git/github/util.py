@@ -34,5 +34,7 @@ def list_merged_pull_requests(repo_name: str, token: str):
             "title": entry["title"],
             "merged": True if entry["merged_at"] else False,
             "merge_sha": entry["merge_commit_sha"],
+            "base": entry["base"]["sha"],
+            "head": entry["head"]["sha"]
         }
     return result
