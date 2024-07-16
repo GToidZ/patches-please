@@ -4,8 +4,11 @@ from fastapi import FastAPI
 from git import Blob
 
 from .config import settings
-from .git import GitRepositoryManager
-from .git.github import list_closed_pull_requests
+from .git import (
+    GitRepositoryManager,
+    list_closed_pull_requests,
+    list_merged_pull_requests
+)
 
 @contextlib.asynccontextmanager
 async def app_lifecycle(app: FastAPI):
@@ -21,6 +24,10 @@ app = FastAPI(lifespan=app_lifecycle)
 @app.get("/pr/{repo:path}")
 def pull_requests_info(repo: str, settings: settings):
     return list_closed_pull_requests(repo, settings.gh_api_token)
+
+@app.get("/merges/{repo:path}")
+def merged_prs(repo: str, settings: settings):
+    return list_merged_pull_requests(repo, settings.gh_api_token)
 
 @app.get("/ls/{repo:path}")
 def show_tree_repo(repo: str, settings: settings):
