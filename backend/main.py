@@ -1,5 +1,4 @@
 import contextlib
-import itertools
 from fastapi import FastAPI
 from git import Blob
 
@@ -9,16 +8,16 @@ from .git import (
     list_closed_pull_requests,
     list_merged_pull_requests
 )
-from .game import GameSystem
+from .game import GameSystem, setup_database
 
 @contextlib.asynccontextmanager
 async def app_lifecycle(app: FastAPI):
+    setup_database()
     repo_manager = GitRepositoryManager()
     yield
     repo_manager.cleanup()
 
 app = FastAPI(lifespan=app_lifecycle)
-
 
 # -- Tests --
 
