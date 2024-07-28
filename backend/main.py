@@ -78,6 +78,34 @@ def test_generate_prompt(repo: str, settings: settings):
     Test generate a prompt in game.
     """
     system = GameSystem()
-    level = system.generate_new_level(repo)
-    prompt = system.generate_new_prompt(level)
-    return prompt.model_dump_json()
+    session = system.new_game()
+    level = system.generate_new_level(str(session.id), repo)
+    prompt = system.generate_new_prompt(str(session.id), level)
+    return prompt.model_dump()
+
+@app.get("/test/session/{repo:path}")
+def test_generate_session(repo: str, settings: settings):
+    """
+    Test generate a session in game.
+    """
+    system = GameSystem()
+    session = system.new_game()
+    level = system.generate_new_level(str(session.id), repo)
+    system.generate_new_prompt(str(session.id), level)
+    return session.model_dump()
+
+@app.post("/test/submit/{sid}/yes")
+def test_submit_yes(sid: str, settings: settings):
+    """
+    Submit yes to game session.
+    """
+    system = GameSystem()
+    return system.send_answer(sid, True).model_dump()
+
+@app.post("/test/submit/{sid}/no")
+def test_submit_no(sid: str, settings: settings):
+    """
+    Submit no to game session.
+    """
+    system = GameSystem()
+    return system.send_answer(sid, False).model_dump()
