@@ -51,7 +51,6 @@ class Level(SQLModel, table=True):
 
     prompt_number: int = Field(default=1)
     max_prompts: int = Field(default=10)
-    current_prompt: Optional[UUID] = Field(foreign_key="prompt.id", ondelete="SET NULL")
 
 class Prompt(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)

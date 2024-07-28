@@ -170,7 +170,7 @@ class GameSystem:
 
         game_session = self.get_session(sid)
         level = game_session.current_level
-        _stmt = select(Level).where(Level.id == level)
+        _stmt = select(Level).where(Level.id == level.id)
         _res = db_session.exec(_stmt)
 
         level: Level = _res.one()
@@ -202,7 +202,8 @@ class GameSystem:
 
             if level.prompt_number < level.max_prompts:
                 level.prompt_number += 1
-                self.generate_new_prompt(game_session.id, level)
+                self.generate_new_prompt(str(game_session.id), level)
+                game_session.current_level = level  # reassign level object
                 db_session.add(level)
             else:
                 game_session.current_prompt = None
