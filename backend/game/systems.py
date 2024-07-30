@@ -80,6 +80,7 @@ class GameSystem:
             if str(pr['head']['ref']).startswith('dependabot'):
                 # Dependabot has no changes stored in repository.
                 continue
+            # TODO: Problem is that GitHub can contain missing trees
 
             try:
                 ref = f"{pr['merge_sha']}^1"
